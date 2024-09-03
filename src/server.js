@@ -1,12 +1,22 @@
 require("dotenv").config(); //phai cai dotenv+ cho nao can dung bien moi truong thi phai them vao
 const express = require("express");
 const app = express();
-const port = process.env.PORT;
+const port = process.env.PORT || 8888;
 const configViewEngine = require("./config/viewEngine");
-const webRouter = require("./routes/web");
-app.use("/demo", webRouter);
 configViewEngine(app);
+const webRouter = require("./routes/web");
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use("/", webRouter);
+
+app.get("/", function (req, res) {
+  res.render("user.ejs");
+});
 
 app.listen(port, () => {
   console.log(`Example app listening on port:http://localhost:${port}/`);
 });
+
+// app.use(express.json()); // for parsing application/json
+// app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
