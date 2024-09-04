@@ -5,6 +5,7 @@ const port = process.env.PORT || 8888;
 const configViewEngine = require("./config/viewEngine");
 configViewEngine(app);
 const webRouter = require("./routes/web");
+//config to get request body
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -18,5 +19,4 @@ app.listen(port, () => {
   console.log(`Example app listening on port:http://localhost:${port}/`);
 });
 
-// app.use(express.json()); // for parsing application/json
-// app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+
