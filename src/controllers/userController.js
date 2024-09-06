@@ -1,51 +1,22 @@
 const express = require("express");
 const connection = require("../config/database");
-
+const User = require("../models/User");
 const registerUser = async (req, res) => {
-  try {
-    const { username, email, password } = req.body;
-    console.log(req.body);
+  const { username, email, password } = req.body;
+  console.log(req.body);
 
-    if (!username || !email || !password) {
-      return res.status(400).json({ message: "Missing required fields" });
-    }
+  User.create({
+    username: username,
+    email: email,
+    password: password,
+  });
 
-    // Kiểm tra user và email
-    const [rows, fields] = await connection.query(
-      "SELECT * FROM user WHERE username = ? OR email = ?",
-      [username, email]
-    );
-    console.log("Rows:", rows);
-
-    if (rows.length > 0) {
-      return res
-        .status(409)
-        .json({ message: "Username or Email already exists" });
-    }
-
-    // Thêm user mới
-    const [result] = await connection.query(
-      "INSERT INTO user (username, email, password) VALUES (?, ?, ?)",
-      [username, email, password]
-    );
-    res.status(201).json({
-      message: "User registered successfully",
-      userId: result.insertId,
-    });
-  } catch (error) {
-    console.error("Error in registerUser:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
+  res.status(200).json({ message: "Success" });
 };
 
 const showUser = async (req, res) => {
-  try {
-    const [rows, fields] = await connection.query("Select * from user");
-    return res.status(200).json(rows);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Interal server error" });
-  }
+  const docs = await User.find({});
+  return res.status(200).json(docs);
 };
 
 const editUser = async (req, res) => {
@@ -66,4 +37,16 @@ const editUser = async (req, res) => {
     return res.status(500).json({ message: "Internal server error: " + error });
   }
 };
-module.exports = { registerUser, showUser, editUser };
+
+const getById = async (req, res) => {
+  const { id } = req.params;
+  const docs = await User.findById({ _id: id });
+  return res.status(200).json(docs);
+};
+
+const deleteUserById = async (req, res) => {
+  const { userId } = req.params;
+  await User.deleteOne({ _id: userId }); // returns {deletedCount: 1}
+  return res.status(200).json({ message: "Delete success" });
+};
+module.exports = { registerUser, showUser, editUser, getById, deleteUserById };

@@ -5,6 +5,7 @@ const port = process.env.PORT || 8888;
 const configViewEngine = require("./config/viewEngine");
 configViewEngine(app);
 const webRouter = require("./routes/web");
+const connection = require("./config/database");
 //config to get request body
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -15,8 +16,14 @@ app.get("/", function (req, res) {
   res.render("user.ejs");
 });
 
-app.listen(port, () => {
-  console.log(`Example app listening on port:http://localhost:${port}/`);
-});
 
-
+(async () => {
+  try {
+    await connection();
+    app.listen(port, () => {
+      console.log(`Example app listening on port:http://localhost:${port}/`);
+    });
+  } catch (error) {
+    console.log(">>> Error: ", error);
+  }
+})();
